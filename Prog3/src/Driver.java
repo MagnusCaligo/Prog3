@@ -13,6 +13,10 @@ public class Driver {
 		dick.loadDictionary("Latin.txt");
 		
 		System.out.println(Arrays.toString(dick.getRange("amarare", "zzzzzzz")));
+		LatinDictionary dick = new LatinDictionary();
+		dick.loadDictionary("Latin.txt");
+		System.out.println(dick.getDefinition("amare"));
+
 	}
 	
 	

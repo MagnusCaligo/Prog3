@@ -19,6 +19,7 @@ public class LatinDictionary {
     	dictionary = new HashTable<String, String>(10000);
     	dictionary = new BinarySearchTree<>();
     	dictionary = new RedBlackTree();
+    	dictionary = new BinarySearchTree<>();
     	
         }
 
