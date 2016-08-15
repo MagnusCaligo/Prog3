@@ -134,6 +134,26 @@ public class HashTable<K, V> implements DictionaryADT<K, V>{
 				
 			}
 			index = 0;
+			
+			int in, out, h=1;
+			K temp;
+			int size = keyStorage.length;
+			while(h <=size/3)
+				h = h*3+1;
+			while(h > 0){
+				for(out = h; out < size; out++){
+					temp = keyStorage[out];
+					in = out;
+					while(in > h-1 && ((Comparable<K>)keyStorage[in-h]).compareTo(temp) >= 0){
+						keyStorage[in] = keyStorage[in-h];
+						in -=h;
+					}
+					keyStorage[in] = temp;
+				}
+				h = (h-1)/3;
+			}
+			
+			
 		}
 		
 		@Override
