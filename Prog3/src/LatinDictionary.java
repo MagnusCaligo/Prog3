@@ -1,8 +1,10 @@
-import java.util.ArrayList;
 import java.util.Iterator;
 
+import data_structures.BinarySearchTree;
 import data_structures.DictionaryADT;
 import data_structures.HashTable;
+import data_structures.RedBlackTree;
+import data_structures.UnorderedList;
 
 public class LatinDictionary {
     private DictionaryADT<String,String> dictionary;
@@ -15,6 +17,8 @@ public class LatinDictionary {
     public LatinDictionary() {
     	
     	dictionary = new HashTable<String, String>(10000);
+    	dictionary = new BinarySearchTree<>();
+    	dictionary = new RedBlackTree();
     	
         }
 
@@ -50,25 +54,24 @@ public class LatinDictionary {
     // inclusive, in sorted order. Neither value 'start' or 'finish' need be in the
     // dictionary.  Returns null if there are no keys in the range specified.    
     public String[] getRange(String start, String finish) {
-    	ArrayList<String> strings = new ArrayList<String>();
-    	Iterator keys = dictionary.keys();
- 
-    	boolean found = false;
-    	while(keys.hasNext()){
-    		String key = (String) keys.next();
-    		if(found){
-    			strings.add(key);
-    			if(key.equals(finish))
-    				break;
-    		}
-    		else{
-    			if(key.equals(start)){
-    				found = true;
-    				strings.add(key);
-    			}
+    	
+    	UnorderedList<String> list = new UnorderedList<String>();
+    	Iterator<String> it = dictionary.keys();
+    	while(it.hasNext()){
+    		String string = it.next();
+    		if(((Comparable<String>)string).compareTo(start) >=0 && ((Comparable<String>)string).compareTo(finish) <=0){
+    			list.add(string);
     		}
     	}
-    	return strings.toArray(new String[strings.size()]);
+    	
+    	String[] array = new String[list.getSize()];
+    	it = list.iterator();
+    	int i = 0;
+    	while(it.hasNext())
+    		array[i++] = it.next();
+    	
+    	return array;
+    	
     }
             
     // returns an Iterator of the latin words (the keys) in the dictionary,

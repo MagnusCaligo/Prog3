@@ -1,11 +1,13 @@
 package data_structures;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
 public class HashTable<K, V> implements DictionaryADT<K, V>{
 	
 	private int maxSize;
 	private int currentSize;
+	private int sequenceNumber;
 	private UnorderedList<Wrapper>[] storage;
 	
 	public HashTable(int max){
@@ -31,6 +33,7 @@ public class HashTable<K, V> implements DictionaryADT<K, V>{
 		//if(storage[location].getSize() > 1) return false;
 		storage[location].add(new Wrapper(key, value));
 		currentSize++;
+		sequenceNumber++;
 		return true;
 	}
 
@@ -41,6 +44,7 @@ public class HashTable<K, V> implements DictionaryADT<K, V>{
 		if(storage[location].getSize() > 0){
 			storage[location].remove(new Wrapper(key, null));
 			currentSize--;
+			sequenceNumber++;
 			return true;
 		}
 		return false;
@@ -82,7 +86,7 @@ public class HashTable<K, V> implements DictionaryADT<K, V>{
 
 	@Override
 	public boolean isEmpty() {
-		return !(currentSize == 0);
+		return (currentSize == 0);
 	}
 
 	@Override
@@ -91,6 +95,7 @@ public class HashTable<K, V> implements DictionaryADT<K, V>{
 			if(storage[i] != null)
 				storage[i].clear();
 		}
+		currentSize = 0;
 		
 	}
 
@@ -118,6 +123,7 @@ public class HashTable<K, V> implements DictionaryADT<K, V>{
 
 		private int index;
 		private K[] keyStorage;
+		private int modNumber = sequenceNumber;
 		
 		public KeysIterator(){
 			keyStorage = (K[]) new Object[currentSize]; 
@@ -134,15 +140,37 @@ public class HashTable<K, V> implements DictionaryADT<K, V>{
 				
 			}
 			index = 0;
+			
+			int in, out, h=1;
+			K temp;
+			int size = keyStorage.length;
+			while(h <=size/3)
+				h = h*3+1;
+			while(h > 0){
+				for(out = h; out < size; out++){
+					temp = keyStorage[out];
+					in = out;
+					while(in > h-1 && ((Comparable<K>)keyStorage[in-h]).compareTo(temp) >= 0){
+						keyStorage[in] = keyStorage[in-h];
+						in -=h;
+					}
+					keyStorage[in] = temp;
+				}
+				h = (h-1)/3;
+			}
+			
+			
 		}
 		
 		@Override
 		public boolean hasNext() {
+			if(modNumber != sequenceNumber) throw new ConcurrentModificationException();
 			return index < keyStorage.length;
 		}
 
 		@Override
 		public Object next() {
+			if(modNumber != sequenceNumber) throw new ConcurrentModificationException();
 			return keyStorage[index++];
 		}
 		
@@ -151,7 +179,9 @@ public class HashTable<K, V> implements DictionaryADT<K, V>{
 	class ValuesIterator<V> implements Iterator{
 		private int index;
 		private V[] valueStorage;
-		Wrapper<K,V> wrap;
+		private int modNumber = sequenceNumber;
+		private Wrapper<K,V> wrap;
+		
 		
 		public ValuesIterator(){
 			valueStorage = (V[]) new Object[currentSize]; 
@@ -171,11 +201,13 @@ public class HashTable<K, V> implements DictionaryADT<K, V>{
 		
 		@Override
 		public boolean hasNext() {
+			if(modNumber != sequenceNumber) throw new ConcurrentModificationException();
 			return index < valueStorage.length;
 		}
 
 		@Override
 		public Object next() {
+			if(modNumber != sequenceNumber) throw new ConcurrentModificationException();
 			return valueStorage[index++];
 		}
 	}
